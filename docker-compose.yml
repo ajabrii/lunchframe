@@ -25,8 +25,12 @@ services:
   # ─── Frontend ───────────────────────────────────────────
   frontend:
     build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost/api
+      - VITE_API_URL=http://localhost/api/v1
+      - VITE_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     networks:
       - lunchframe_net
     restart: unless-stopped
@@ -38,11 +42,13 @@ services:
       - DATABASE_URL=postgresql+asyncpg://lunchframe:secret@postgres:5432/lunchframe
       - REDIS_URL=redis://redis:6379/0
       - JWT_SECRET=${JWT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - CRAWLER_URL=http://crawler:8001
       - SCRIPTGEN_URL=http://scriptgen:8002
       - TTS_URL=http://tts:8004
       - RENDERER_URL=http://renderer:8003
       - MINIO_URL=http://minio:9000
+      - MINIO_PUBLIC_URL=http://localhost:9000
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     depends_on:
@@ -111,6 +117,9 @@ services:
       - SCRIPTGEN_URL=http://scriptgen:8002
       - TTS_URL=http://tts:8004
       - RENDERER_URL=http://renderer:8003
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     depends_on:
       - postgres
       - redis
@@ -145,6 +154,7 @@ services:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     ports:
+      - "9000:9000"
       - "9001:9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}

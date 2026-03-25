@@ -18,6 +18,10 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class GoogleLoginRequest(BaseModel):
+    id_token: str
+
+
 class UserResponse(BaseModel):
     id: uuid.UUID
     email: str
@@ -67,7 +71,8 @@ class VideoGenerateResponse(BaseModel):
 
 
 class VideoEditRequest(BaseModel):
-    prompt: str
+    title: str | None = Field(None, max_length=200)
+    prompt: str | None = None
 
 
 class VideoListResponse(BaseModel):

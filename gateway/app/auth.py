@@ -29,7 +29,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 # ─── JWT ───────────────────────────────────────────────────
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 
 def create_access_token(user_id: uuid.UUID) -> str:
@@ -60,11 +60,24 @@ def decode_access_token(token: str) -> dict:
 
 # ─── FastAPI dependency ───────────────────────────────────
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    token_query: str | None = None,
+    credentials: HTTPAuthorizationCredentials | None = Depends(security),
     db: AsyncSession = Depends(get_db),
 ) -> User:
     """FastAPI dependency: extract and validate user from JWT token."""
-    payload = decode_access_token(credentials.credentials)
+    token = None
+    if isinstance(credentials, HTTPAuthorizationCredentials):
+        token = credentials.credentials
+    elif token_query:
+        token = token_query
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authentication token",
+        )
+
+    payload = decode_access_token(token)
 
     user_id = payload.get("sub")
     if user_id is None:

@@ -17,13 +17,43 @@ from app.routers import auth_router, projects_router, templates_router, videos_r
 logger = logging.getLogger("lunchframe.gateway")
 
 
+async def seed_data(conn):
+    """Seed initial templates if they don't exist."""
+    from sqlalchemy import text, func
+    import uuid
+
+    from datetime import datetime, timezone
+    
+    # Check for existing templates
+    res = await conn.execute(text("SELECT count(*) FROM templates"))
+    if res.scalar() == 0:
+        logger.info("🌱 Seeding default templates...")
+        template_id = "00000000-0000-0000-0000-000000000001"
+        await conn.execute(
+            text("""
+                INSERT INTO templates (id, slug, name, category, description, remotion_component, is_premium, created_at)
+                VALUES (:id, :slug, :name, :category, :description, :comp, :premium, :now)
+            """),
+            {
+                "id": template_id,
+                "slug": "cinematic-dark",
+                "name": "Cinematic Dark",
+                "category": "High-End",
+                "description": "A moody, high-contrast template inspired by Linear/Vercel launches.",
+                "comp": "CinematicDark",
+                "premium": False,
+                "now": datetime.now(timezone.utc)
+            }
+        )
+        logger.info(f"✅ Seeded 'Cinematic Dark' template ({template_id})")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Create database tables on startup."""
+    """Create database tables and seed data on startup."""
     logger.info("🚀 Launchframe Gateway starting up...")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    logger.info("✅ Database tables created")
+        await seed_data(conn)
     yield
     logger.info("🛑 Launchframe Gateway shutting down...")
     await engine.dispose()

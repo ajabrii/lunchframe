@@ -13,6 +13,9 @@ cp .env.local .env
 # 2. Add your Groq API key to .env
 # GROQ_API_KEY=gsk_your_key_here
 
+# 2.1 Add Google OAuth client id (used by frontend + gateway)
+# GOOGLE_CLIENT_ID=your_google_web_client_id.apps.googleusercontent.com
+
 # 3. Start all services
 docker compose up --build
 

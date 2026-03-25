@@ -1,2 +1,10 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.0
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+aioboto3
+python-multipart
+scipy
+numpy
+# For Kokoro (if available/desired)
+# kokoro-onnx

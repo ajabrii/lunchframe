@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_HOURS: int = 24
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str | None = None
+
     # Downstream services
     CRAWLER_URL: str = "http://crawler:8001"
     SCRIPTGEN_URL: str = "http://scriptgen:8002"
@@ -25,6 +28,7 @@ class Settings(BaseSettings):
 
     # MinIO
     MINIO_URL: str = "http://minio:9000"
+    MINIO_PUBLIC_URL: str = "http://localhost:9000"
     MINIO_ACCESS_KEY: str = "lunchframe_dev"
     MINIO_SECRET_KEY: str = "lunchframe_dev_secret_min_8"
 
